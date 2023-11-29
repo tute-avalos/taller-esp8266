@@ -8,7 +8,7 @@ const char *PSWD = "asdf1234";
 
 ESP8266WebServer server(80);
 
-void home() { 
+String renderizarIndex() {
   String page = indexPageStart;
   page += estadoLed;
   if(digitalRead(LED_BUILTIN) == LOW) {
@@ -17,39 +17,31 @@ void home() {
     page.replace("{s}", "Apagado");
   }
   page += indexPageEnd;
-  server.send(200, "text/html", page); 
+  return page;
 }
+
+void home() { 
+  server.send(200, "text/html", renderizarIndex()); 
+}
+
 void notFound(){
   server.send(404, "text/plain", "404 - No se encontro");
-} 
+}
+
 void toggleLed() {
   digitalWrite(LED_BUILTIN, not digitalRead(LED_BUILTIN));
-  String page = indexPageStart;
-  page += estadoLed;
-  if(digitalRead(LED_BUILTIN) == LOW) {
-    page.replace("{s}", "Prendido");
-  } else {
-    page.replace("{s}", "Apagado");
-  }
-  page += indexPageEnd;
-  server.send(200, "text/html", page);
+  server.send(200, "text/html", renderizarIndex());
 }
+
 void cambiarEstado() {
   if(server.method() == HTTP_POST) {
     String estado = server.arg("estado");
     digitalWrite(LED_BUILTIN, estado == "on" ? LOW : HIGH);
-    String page = indexPageStart;
-    page += estadoLed;
-    if(digitalRead(LED_BUILTIN) == LOW) {
-      page.replace("{s}", "Prendido");
-    } else {
-      page.replace("{s}", "Apagado");
-    }
-    page += indexPageEnd;
-    server.send(200, "text/html", page);
+    server.send(200, "text/html", renderizarIndex());
   }
   server.send(503, "text/plain", "503 - Ud. no deberia estar aqui");
 }
+
 void setup() {
   // put your setup code here, to run once:
   pinMode(LED_BUILTIN, OUTPUT);
