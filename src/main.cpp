@@ -38,8 +38,9 @@ void cambiarEstado() {
     String estado = server.arg("estado");
     digitalWrite(LED_BUILTIN, estado == "on" ? LOW : HIGH);
     server.send(200, "text/html", renderizarIndex());
+  } else {
+    server.send(503, "text/plain", "503 - Ud. no deberia estar aqui");
   }
-  server.send(503, "text/plain", "503 - Ud. no deberia estar aqui");
 }
 
 void setup() {
